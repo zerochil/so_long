@@ -1,0 +1,32 @@
+/* XPM */
+static char *coin_f2[] = {
+/* columns rows colors chars-per-pixel */
+"17 20 6 1 ",
+"  c None",
+". c #EE8D2E",
+"X c #F09831",
+"o c #F4AD36",
+"O c #F8C13B",
+"+ c #FACC3E",
+/* pixels */
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      ",
+"      +OoX.      "
+};
