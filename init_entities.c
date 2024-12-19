@@ -14,29 +14,10 @@
 
 void	init_player(t_game *game)
 {
-	int	y;
-	int	x;
-
-	y = 0;
-	while (y < game->dimensions.height)
-	{
-		x = 0;
-		while (x < game->dimensions.width)
-		{
-			if (game->map[y][x] == PLAYER)
-			{
-				game->player.pos.x = x;
-				game->player.pos.y = y;
-				game->player.frame = 0;
-				game->player.facing = DOWN;
-				game->player.moves = 0;
-				game->map[y][x] = EMPTY_SPACE;
-				return ;
-			}
-			x++;
-		}
-		y++;
-	}
+	game->player.frame = 0;
+	game->player.facing = DOWN;
+	game->player.moves = 0;
+	game->map[game->player.pos.y][game->player.pos.x] = EMPTY_SPACE;
 }
 
 void	init_coins(t_game *game)
@@ -47,7 +28,7 @@ void	init_coins(t_game *game)
 	int					y;
 	int					x;
 
-	coin_anim = create_animation(game->sprites.coin, 4, FRAME_DELAY);
+	coin_anim = init_animation(game->sprites.coin, 4, FRAME_DELAY / 10);
 	y = 0;
 	while (y < game->dimensions.height)
 	{
@@ -58,7 +39,7 @@ void	init_coins(t_game *game)
 			{
 				pos.x = x;
 				pos.y = y;
-				coin = create_entity(pos, coin_anim, ENTITY_COIN);
+				coin = init_entity(pos, coin_anim, ENTITY_COIN);
 				add_entity(game->entity_manager, coin);
 			}
 			x++;
@@ -67,20 +48,30 @@ void	init_coins(t_game *game)
 	}
 }
 
-static int	create_enemy_if_possible(t_game *game, t_animation animation,
+static int	init_enemy_if_possible(t_game *game, t_animation animation,
 		enum e_entity_type type, t_point pos)
 {
 	t_animated_entity	*enemy;
 
-	if (game->map[pos.y][pos.x] == EMPTY_SPACE && (abs(pos.x
-				- game->player.pos.x) > 5 || abs(pos.y
-				- game->player.pos.y) > 5))
+	if (game->map[pos.y][pos.x] != EMPTY_SPACE)
+		return (0);
+	if (abs(pos.x - game->player.pos.x) <= 1 && abs(pos.y
+			- game->player.pos.y) <= 1)
+		return (0);
+	game->map[pos.y][pos.x] = 'X';
+	if (!is_reachable(game, game->player.pos, game->exit_pos))
 	{
-		enemy = create_entity(pos, animation, type);
-		add_entity(game->entity_manager, enemy);
-		return (1);
+		game->map[pos.y][pos.x] = '0';
+		return (0);
 	}
-	return (0);
+	game->map[pos.y][pos.x] = '0';
+	enemy = init_entity(pos, animation, type);
+	add_entity(game->entity_manager, enemy);
+	if (type == ENTITY_ENEMY1)
+		game->enemies_pos[0] = pos;
+	else
+		game->enemies_pos[1] = pos;
+	return (1);
 }
 
 void	init_enemies(t_game *game)
@@ -92,16 +83,18 @@ void	init_enemies(t_game *game)
 	enum e_entity_type	type[2];
 
 	count = 0;
-	max_attempts = 100;
-	anim[0] = create_animation(game->sprites.enemy1, 4, FRAME_DELAY);
-	anim[1] = create_animation(game->sprites.enemy2, 2, FRAME_DELAY);
+	max_attempts = 1000;
+	anim[0] = init_animation(game->sprites.enemy1, 4, FRAME_DELAY / 10);
+	anim[1] = init_animation(game->sprites.enemy2, 2, FRAME_DELAY / 10);
 	type[0] = ENTITY_ENEMY1;
 	type[1] = ENTITY_ENEMY2;
+	game->obstacles = "1X";
 	while (count < 2 && max_attempts > 0)
 	{
 		pos.x = arc4random() % game->dimensions.width;
 		pos.y = arc4random() % game->dimensions.height;
-		count += create_enemy_if_possible(game, anim[count], type[count], pos);
+		count += init_enemy_if_possible(game, anim[count], type[count], pos);
 		max_attempts--;
 	}
+	game->obstacles = "1";
 }

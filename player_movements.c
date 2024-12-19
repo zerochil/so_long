@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minilibx/mlx.h"
 #include "so_long.h"
 
 static void	print_moves(t_game *game, char *s1, int moves)
@@ -50,10 +49,11 @@ static void	handle_collision(t_game *game, int new_x, int new_y)
 	game->player.pos.y = new_y;
 	game->player.moves++;
 	print_moves(game, "Moves: ", game->player.moves);
+	if ((new_x == game->enemies_pos[0].x && new_y == game->enemies_pos[0].y)
+		|| (new_x == game->enemies_pos[1].x && new_y == game->enemies_pos[1].y))
+		game_over(GAME_OVER_MESSAGE);
 	if (game->map[new_y][new_x] == EXIT && game->collectibles_count == 0)
-	{
 		game_over("Congrats! you won the game.");
-	}
 }
 
 static void	move_player(t_game *game, enum e_directions direction)
@@ -61,6 +61,8 @@ static void	move_player(t_game *game, enum e_directions direction)
 	int	new_x;
 	int	new_y;
 
+	if (game->game_start_time == 0)
+		game->game_start_time = clock();
 	new_x = game->player.pos.x;
 	new_y = game->player.pos.y;
 	if (game->player.facing == direction)

@@ -12,7 +12,7 @@
 
 #include "so_long.h"
 
-t_animation	create_animation(t_image *frames, int frame_count,
+t_animation	init_animation(t_image *frames, int frame_count,
 		int update_interval)
 {
 	t_animation	anim;
@@ -37,39 +37,34 @@ void	update_animation(t_animation *anim)
 	}
 }
 
-static void	update_enemy_position(t_game *game, t_animated_entity *entity,
-		int last_enemy_move)
+static t_point	new_random_position(t_point pos)
 {
-	clock_t	current_time;
-	t_point	distance;
 	t_point	new_pos;
+	int		random;
 
-	current_time = clock();
-	if ((current_time - last_enemy_move) >= ENEMY_MOVE_DELAY)
-	{
-		distance.x = game->player.pos.x - entity->pos.x;
-		distance.y = game->player.pos.y - entity->pos.y;
-		new_pos.x = entity->pos.x;
-		new_pos.y = entity->pos.y;
-		if (abs(distance.x) > abs(distance.y))
-			new_pos.x += if_else((distance.x > 0), 1, -1);
-		else
-			new_pos.y += if_else((distance.y > 0), 1, -1);
-		if (can_move_to(game, new_pos.x, new_pos.y))
-		{
-			entity->pos.x = new_pos.x;
-			entity->pos.y = new_pos.y;
-		}
-		if (entity->pos.x == game->player.pos.x
-			&& entity->pos.y == game->player.pos.y)
-			game_over("Game Over! You were caught by an enemy!");
-	}
+	random = arc4random_uniform(2) * 2 - 1;
+	new_pos = pos;
+	if (random >= 0)
+		new_pos.x += arc4random_uniform(2) * 2 - 1;
+	else
+		new_pos.y += arc4random_uniform(2) * 2 - 1;
+	return (new_pos);
+}
+
+static void	update_enemy_position(t_game *game, t_animated_entity *entity,
+		t_point new_pos)
+{
+	entity->pos.x = new_pos.x;
+	entity->pos.y = new_pos.y;
+	if (entity->type == ENTITY_ENEMY1)
+		game->enemies_pos[0] = entity->pos;
+	else
+		game->enemies_pos[1] = entity->pos;
 }
 
 void	update_entities(t_game *game)
 {
 	t_animated_entity	*entity;
-	static clock_t		last_enemy_move = 0;
 	clock_t				current_time;
 	int					i;
 
@@ -80,9 +75,7 @@ void	update_entities(t_game *game)
 		entity = game->entity_manager->entities.data[i];
 		update_animation(&entity->anim);
 		if (entity->type == ENTITY_ENEMY1 || entity->type == ENTITY_ENEMY2)
-			update_enemy_position(game, entity, last_enemy_move);
+			move_enemy(game, entity);
 		i++;
 	}
-	if ((current_time - last_enemy_move) >= ENEMY_MOVE_DELAY)
-		last_enemy_move = current_time;
 }

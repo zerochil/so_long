@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/base/base.h"
 #include "so_long.h"
 
 static void	destroy_game(void *ptr)
@@ -42,15 +41,17 @@ static int	close_win(void *ptr)
 	return (0);
 }
 
-static void start_game(t_game *game)
+static void	start_game(t_game *game)
 {
-	game->entity_manager = create_entity_manager();
+	game->game_start_time = 0;
+	game->entity_manager = init_entity_manager();
 	load_sprites(game);
 	init_player(game);
 	init_enemies(game);
 	init_coins(game);
 	mlx_hook(game->win, 2, 1, key_hook, game);
-	mlx_hook(game->win, 17, 0, close_win, NULL); // TODO: check the red cross work
+	mlx_hook(game->win, 17, 0, close_win, NULL);
+		// TODO: check the red cross work
 	mlx_loop_hook(game->mlx, game_loop, game);
 	mlx_loop(game->mlx);
 }
@@ -60,11 +61,17 @@ int	main(int argc, char **argv)
 	t_game	*game;
 
 	// TODO: The management of your window must remain smooth (changing to another window, minimizing, and so forth
-	// TODO:- Hide all or part of the window either by using another windowor by using the screen's borders, then minimize the windows and maximize it back. In all cases, the content of the window must remain consiste 
-	// TOOD: moves should be rendered all the same
+	// TODO:- Hide all or part of the window either by using another windowor by using the screen's borders, then minimize the windows and maximize it back. In all cases, the content of the window must remain consiste
+	// [Done] TOOD: moves should be rendered all the same
+	// [Done] TODO: if the map is too small, there should still be enemies on the map; just use a timeout
+	// TODO: try to resize the window or minimize or enlarge
+	// [Done] TODO: add _bonus to files
+	// TOOD: dial down entities and animation behavior
+	// [DONE] TODO: remove one_avenue
 	if (argc < 2 || !ends_with(argv[1], ".ber"))
 		error("Error\nUsage: ./so_long map.ber");
 	game = get_game_instance();
+	ft_memset(game, 0, sizeof(t_game));
 	parse(game, argv[1]);
 	track_resource(game, destroy_game);
 	game->mlx = mlx_init();

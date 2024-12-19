@@ -1,76 +1,65 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   find_path.c                                        :+:      :+:    :+:   */
+/*   parser_path_finder.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rrochd <rrochd@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 08:42:53 by rrochd            #+#    #+#             */
-/*   Updated: 2024/12/16 09:02:36 by rrochd           ###   ########.fr       */
+/*   Updated: 2024/12/19 10:51:43 by rrochd           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-static int	can_move(t_game *game, int x, int y, t_array *visited)
+static int	valid_move(t_point pos)
 {
-	t_point	*pos;
-	size_t	i;
+	t_game	*game;
 
-	if (x < 0 || x >= game->dimensions.width || y < 0
-		|| y >= game->dimensions.height)
+	game = get_game_instance();
+	if (pos.x < 0 || pos.x >= game->dimensions.width || pos.y < 0
+		|| pos.y >= game->dimensions.height)
 		return (0);
-	if (game->map[y][x] == '1')
+	if (ft_strchr(game->obstacles, game->map[pos.y][pos.x]))
 		return (0);
-	i = 0;
-	while (i < visited->size)
-	{
-		pos = visited->data[i];
-		if (pos->x == x && pos->y == y)
-			return (0);
-		i++;
-	}
 	return (1);
 }
 
-static int	flood(t_game *game, t_point current, t_point target,
-		t_array *visited)
+static int	same_pos(void *ptr1, void *ptr2)
 {
-	static int	dx[4] = {-1, 1, 0, 0};
-	static int	dy[4] = {0, 0, -1, 1};
-	int			i;
-	t_point		*pos;
+	t_point	pos1;
+	t_point	pos2;
 
-	if (current.x == target.x && current.y == target.y)
-		return (1);
-	pos = new_point(current.x, current.y);
-	array_push(visited, pos);
-	i = 0;
-	while (i < 4)
-	{
-		current.x += dx[i];
-		current.y += dy[i];
-		if (can_move(game, current.x, current.y, visited))
-			if (flood(game, current, target, visited))
-				return (1);
-		current.x -= dx[i];
-		current.y -= dy[i];
-		i++;
-	}
-	return (0);
+	pos1 = *(t_point *)ptr1;
+	pos2 = *(t_point *)ptr2;
+	return (pos1.x == pos2.x && pos1.y == pos2.y);
 }
 
-static int	is_reachable(t_game *game, t_point start, t_point target)
+int	is_reachable(t_game *game, t_point start, t_point target)
 {
 	t_array	visited;
-	int		found;
+	t_array	stack;
+	t_point	pos;
 
 	array_init(&visited);
-	found = flood(game, start, target, &visited);
-	array_destroy(&visited);
-	// TODO: destroy visited and all the points
-	// TODO: E can block C
-	return (found);
+	array_init(&stack);
+	array_push(&stack, new_point(start.x, start.y));
+	while (stack.size > 0)
+	{
+		pos = *(t_point *)array_pop(&stack);
+		if (!valid_move(pos))
+			continue ;
+		if (array_find(&visited, &pos, same_pos))
+			continue ;
+		array_push(&visited, new_point(pos.x, pos.y));
+		if (pos.x == target.x && pos.y == target.y)
+			return (free_array(&stack), free_array(&visited), 1);
+		array_push(&stack, new_point(pos.x + 1, pos.y));
+		array_push(&stack, new_point(pos.x - 1, pos.y));
+		array_push(&stack, new_point(pos.x, pos.y + 1));
+		array_push(&stack, new_point(pos.x, pos.y - 1));
+	}
+	return (free_array(&stack), free_array(&visited), 0);
 }
 
 int	are_reachable(t_game *game)
@@ -78,6 +67,7 @@ int	are_reachable(t_game *game)
 	int	x;
 	int	y;
 
+	game->obstacles = "1";
 	x = 0;
 	while (x < game->dimensions.width)
 	{

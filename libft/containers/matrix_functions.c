@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   matrix_functions.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rrochd <rrochd@student.1337.ma>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/19 10:57:55 by rrochd            #+#    #+#             */
+/*   Updated: 2024/12/19 10:58:38 by rrochd           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "containers.h"
 
 t_point	find_in_matrix(void **arr, t_dimensions dim, int target, size_t size)
@@ -50,7 +62,8 @@ int	count_in_matrix(void **arr, t_dimensions dim, int target, size_t size)
 	return (count);
 }
 
-int	is_true_in_matrix(void **arr, t_dimensions dim, int condition(t_point, t_dimensions, int), size_t size)
+int	is_true_in_matrix(void **arr, t_dimensions dim, int condition(t_point,
+			t_dimensions, int), size_t size)
 {
 	int	x;
 	int	y;
@@ -63,9 +76,11 @@ int	is_true_in_matrix(void **arr, t_dimensions dim, int condition(t_point, t_dim
 		x = 0;
 		while (x < dim.width)
 		{
-			if (size == sizeof(int) && condition((t_point){x, y}, dim, ((int *)arr[y])[x]) == 0)
+			if (size == sizeof(int) && condition((t_point){x, y}, dim,
+				((int *)arr[y])[x]) == 0)
 				return (0);
-			if (size == sizeof(char) && condition((t_point){x, y}, dim,((char *)arr[y])[x]) == 0)
+			if (size == sizeof(char) && condition((t_point){x, y}, dim,
+				((char *)arr[y])[x]) == 0)
 				return (0);
 			x++;
 		}

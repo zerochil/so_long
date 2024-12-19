@@ -36,7 +36,7 @@ static void	read_map(t_game *game, char *map_filename)
 		error("Error\nEmpty map");
 	game->map = array_dup(&lines);
 	game->dimensions.width = ft_strlen(game->map[0]);
-	game->dimensions.height = array_size(game->map);
+	game->dimensions.height = lines.size;
 	array_destroy(&lines);
 	free_resource(int_to_void(fd));
 }
@@ -51,7 +51,7 @@ void	parse(t_game *game, char *map_filename)
 	map = (void **)game->map;
 	game->collectibles_count = count_in_matrix(map, game->dimensions,
 			COLLECTIBLE, 1);
-	game->player.pos = find_in_matrix(map, game->dimensions, PLAYER,
-			sizeof(char));
+	game->player.pos = find_in_matrix(map, game->dimensions, PLAYER, 1);
+	game->exit_pos = find_in_matrix(map, game->dimensions, EXIT, 1);
 	validate_map(game, map);
 }

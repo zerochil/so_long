@@ -13,9 +13,9 @@
 #ifndef MEMORY_MANAGEMENT_H
 # define MEMORY_MANAGEMENT_H
 
-# include "unistd.h"
-# include "fcntl.h"
 # include "../base/base.h"
+# include "fcntl.h"
+# include "unistd.h"
 
 typedef struct t_resource
 {
@@ -46,7 +46,8 @@ void					track_resource(void *resource, void (*cleanup)(void *));
 
 void					*safe_malloc(size_t size);
 void					*track_malloc(size_t size);
-int	track_open(char *pathname, int flags, mode_t mode, char *error_message);
+int						track_open(char *pathname, int flags, mode_t mode,
+							char *error_message);
 
 void					*int_to_void(int n);
 

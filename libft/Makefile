@@ -6,7 +6,12 @@ BASE_SRCS = ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c ft_isasci
 
 MEMORY_MANAGEMNT_SRCS = error_handling.c get_resources.c scope_operations.c safe_operations.c track_resources.c free_resources.c utils_functions.c
 
-CONTAINERS_SRCS = helper_functions.c array_helper_functions.c vector_functions.c array_functions.c string_functions.c matrix_functions.c point_functions.c 
+CONTAINERS_SRCS = array_access.c array_helper_functions.c array_functions.c array_manipulation.c\
+				  vector_functions.c \
+				  string_functions.c \
+				  matrix_functions.c \
+				  point_functions.c \
+				  helper_functions.c
 
 GET_NEXT_LINE_SRCS = get_next_line.c 
 

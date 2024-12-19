@@ -15,14 +15,16 @@
 
 # include "fcntl.h"
 # include "libft/libft.h"
-# include "minilibx/mlx.h"
 # include "time.h"
 # include "unistd.h"
+# include <mlx.h>
 
 # define TOTAL_FRAMES 2
 # define TILE_SIZE 50
-# define FRAME_DELAY 100000
-# define ENEMY_MOVE_DELAY 100000
+# define FRAME_DELAY CLOCKS_PER_SEC
+# define ENEMY_MOVE_DELAY CLOCKS_PER_SEC
+
+# define GAME_OVER_MESSAGE "Game Over! You were caught by an enemy!"
 
 enum					e_keys
 {
@@ -72,7 +74,7 @@ typedef struct s_sprites
 {
 	t_image				door;
 	t_image				enemy1[4];
-	t_image				enemy2[TOTAL_FRAMES];
+	t_image				enemy2[2];
 	t_image				floor;
 	t_image				player[4][TOTAL_FRAMES];
 	t_image				coin[4];
@@ -92,10 +94,8 @@ typedef struct s_animated_entity
 {
 	t_point				pos;
 	t_animation			anim;
-	int					active;
 	enum e_entity_type	type;
-	enum e_directions	facing;
-	int moves; // For player
+	clock_t				last_move;
 }						t_animated_entity;
 
 typedef struct s_entity_manager
@@ -121,21 +121,27 @@ typedef struct s_game
 	int					collectibles_count;
 	t_sprites			sprites;
 	t_entity_manager	*entity_manager;
+	clock_t				game_start_time;
+	t_point				enemies_pos[2];
+	char				*obstacles;
+	t_point				exit_pos;
 }						t_game;
 
 void					*get_game_instance(void);
 void					game_over(char *message);
 
 int						are_reachable(t_game *game);
+int						is_reachable(t_game *game, t_point start,
+							t_point target);
 void					validate_map(t_game *game, void **map);
 void					parse(t_game *game, char *map_filename);
 
 void					update_entities(t_game *game);
 
-t_animation				create_animation(t_image *frames, int frame_count,
+t_animation				init_animation(t_image *frames, int frame_count,
 							int update_interval);
 
-t_animated_entity		*create_entity(t_point pos, t_animation anim,
+t_animated_entity		*init_entity(t_point pos, t_animation anim,
 							enum e_entity_type type);
 void					add_entity(t_entity_manager *manager,
 							t_animated_entity *entity);
@@ -143,7 +149,7 @@ void					remove_entity_at(t_entity_manager *manager, int x,
 							int y, enum e_entity_type type);
 t_animated_entity		*find_entity_at(t_entity_manager *manager, int x,
 							int y);
-t_entity_manager		*create_entity_manager(void);
+t_entity_manager		*init_entity_manager(void);
 
 void					render_game(t_game *game);
 void					*compose_images(t_game *game, t_image *images,
@@ -157,6 +163,8 @@ void					init_coins(t_game *game);
 void					init_enemies(t_game *game);
 void					load_sprites(t_game *game);
 
-void	*create_empty_image(void *mlx, int width, int height);
+void					*create_empty_image(void *mlx, int width, int height);
+
+void					move_enemy(t_game *game, t_animated_entity *entity);
 
 #endif

@@ -39,5 +39,5 @@ int	track_open(char *pathname, int flags, mode_t mode, char *error_message)
 	if (fd < 0)
 		error(error_message);
 	track_resource((void *)(intptr_t)fd, close_fd);
-	return fd;
+	return (fd);
 }

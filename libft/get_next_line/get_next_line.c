@@ -66,7 +66,7 @@ char	*get_next_line(int fd)
 	{
 		newline = ft_strchr(stored[fd].data, '\n');
 		if (newline)
-			break;
+			break ;
 		bytes_read = read_buffer(fd, &stored[fd]);
 		if (bytes_read <= 0)
 			break ;

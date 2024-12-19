@@ -10,10 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/containers/containers.h"
 #include "so_long.h"
 
-t_entity_manager	*create_entity_manager(void)
+t_entity_manager	*init_entity_manager(void)
 {
 	t_entity_manager	*manager;
 
@@ -22,7 +21,7 @@ t_entity_manager	*create_entity_manager(void)
 	return (manager);
 }
 
-t_animated_entity	*create_entity(t_point pos, t_animation anim,
+t_animated_entity	*init_entity(t_point pos, t_animation anim,
 		enum e_entity_type type)
 {
 	t_animated_entity	*entity;
@@ -31,8 +30,7 @@ t_animated_entity	*create_entity(t_point pos, t_animation anim,
 	entity->pos = pos;
 	entity->anim = anim;
 	entity->type = type;
-	entity->facing = DOWN;
-	entity->moves = 0;
+	entity->last_move = 0;
 	return (entity);
 }
 

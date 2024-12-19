@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helper_functions.c                                 :+:      :+:    :+:   */
+/*   array_access.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rrochd <rrochd@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,16 +12,32 @@
 
 #include "containers.h"
 
-void	*_c_grow(void *old_data, size_t old_cap, size_t new_cap,
-		size_t elem_size)
+void	*array_first_item(t_array *array)
 {
-	void	*new_data;
+	if (!array || array->size == 0)
+		return (NULL);
+	return (array->data[0]);
+}
 
-	new_data = track_malloc(new_cap * elem_size);
-	if (old_data)
+void	*array_last_item(t_array *array)
+{
+	if (!array || array->size == 0)
+		return (NULL);
+	return (array->data[array->size - 1]);
+}
+
+void	*array_find(t_array *array, void *element, int (*cmp)(void *, void *))
+{
+	size_t	i;
+
+	if (!array || !cmp)
+		return (NULL);
+	i = 0;
+	while (i < array->size)
 	{
-		ft_memcpy(new_data, old_data, old_cap * elem_size);
-		free_resource(old_data);
+		if (cmp(array->data[i], element))
+			return (array->data[i]);
+		i++;
 	}
-	return (new_data);
+	return (NULL);
 }
